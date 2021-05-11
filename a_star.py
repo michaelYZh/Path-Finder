@@ -149,8 +149,8 @@ def construct_path(came_from, start, end, cur, draw_grid):
 
 def a_star(draw_grid, grid, start, end, dis_type = "m"):
     time_stamp = 0
-    open_set = PriorityQueue()
-    open_set.put((0, time_stamp, start)) # (f_cost, time_added, node)
+    open_queue = PriorityQueue()
+    open_queue.put((0, time_stamp, start)) # (f_cost, time_added, node)
     came_from = {}
     g_cost = {box: float("inf") for row in grid for box in row}
     g_cost[start] = 0
@@ -160,15 +160,15 @@ def a_star(draw_grid, grid, start, end, dis_type = "m"):
     else:
         f_cost[start] = h_m(start.get_pos(), end.get_pos())
 
-    open_set_hash = {start}
+    open_set = {start}
 
-    while not open_set.empty():
+    while not open_queue.empty():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
 
-        current = open_set.get()[2]
-        open_set_hash.remove(current)
+        current = open_queue.get()[2]
+        open_set.discard(current)
 
         if current == end:
             end.set_end()
@@ -194,10 +194,10 @@ def a_star(draw_grid, grid, start, end, dis_type = "m"):
                     f_cost[neighbor] = temp_g_cost + h_m(neighbor.get_pos(), 
                                                          end.get_pos())
 
-                if neighbor not in open_set_hash:
+                if neighbor not in open_set:
                     time_stamp += 1
-                    open_set.put((f_cost[neighbor], time_stamp, neighbor))
-                    open_set_hash.add(neighbor)
+                    open_queue.put((f_cost[neighbor], time_stamp, neighbor))
+                    open_set.add(neighbor)
                     neighbor.set_open()
         
         draw_grid()
